@@ -1,29 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="659cf7d8-8975-4974-b407-f15187388ad0" name="Changes" comment="" />
+    <list default="true" id="659cf7d8-8975-4974-b407-f15187388ad0" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/services/gateway_api/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/gateway_api/gateway_main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/gestion_agua/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/gestion_agua/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/gestion_agua/water_main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/gestion_energia/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/gestion_energia/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/gestion_energia/energy_main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/gestion_residuos/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/gestion_residuos/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/gestion_residuos/waste_main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/gestion_trafico/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/gestion_trafico/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/gestion_trafico/traffic_main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/seguridad_vigilancia/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/seguridad_vigilancia/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/seguridad_vigilancia/security_main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/service_registry/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/service_registry/registry_main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/wakanda_shared/telemetry.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/energy_service/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/traffic_service/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/prometheus.yml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 8
-}]]></component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Guilleg8&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Guilleg8/Actividad6GuillermoGarciaPeyrona.git&quot;,
+    &quot;accountId&quot;: &quot;267d1b6f-006d-44d4-99d7-eb9bbf7ced16&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="37R1N500Vn6N52RXLl7KCAWBNIA" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

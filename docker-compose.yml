@@ -1,0 +1,150 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------
+  # SERVICIOS DE INFRAESTRUCTURA (Observabilidad)
+  # ----------------------------------------------------------------
+
+  # Jaeger: Para ver las trazas (quién llamó a quién y cuánto tardó)
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686" # UI Web de Jaeger
+      - "4317:4317"   # Puerto para recibir datos OTLP (gRPC)
+    networks:
+      - wakanda-net
+
+  # Prometheus: Para recolectar métricas numéricas
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090" # UI Web de Prometheus
+    networks:
+      - wakanda-net
+
+  # Grafana: Para visualizar los datos de Prometheus
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000" # UI Web de Grafana
+    networks:
+      - wakanda-net
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=wakanda # Contraseña para entrar
+
+  # ----------------------------------------------------------------
+  # SERVICIOS WAKANDA (Python)
+  # ----------------------------------------------------------------
+
+  # 1. Service Registry (El directorio telefónico)
+  service_registry:
+    build:
+      context: .
+      dockerfile: services/service_registry/Dockerfile
+    container_name: service_registry
+    ports:
+      - "8000:8000"
+    environment:
+      - JAEGER_HOST=jaeger
+    networks:
+      - wakanda-net
+
+  # 2. Gestión Tráfico (El servicio simulado)
+  gestion_trafico:
+    build:
+      context: .
+      dockerfile: services/gestion_trafico/Dockerfile
+    container_name: gestion_trafico
+    # No exponemos puerto al host (localhost) para forzar el uso del Gateway,
+    # pero está abierto en la red interna (8001).
+    environment:
+      - PORT=8001
+      - REGISTRY_URL=http://service_registry:8000/register
+      - JAEGER_HOST=jaeger
+    networks:
+      - wakanda-net
+    depends_on:
+      - service_registry
+
+  # 3. API Gateway (La entrada única)
+  gateway_api:
+    build:
+      context: .
+      dockerfile: services/gateway_api/Dockerfile
+    container_name: gateway_api
+    ports:
+      - "8080:8080" # Este es el único puerto que usará el cliente
+    environment:
+      - PORT=8080
+      - REGISTRY_URL=http://service_registry:8000
+      - JAEGER_HOST=jaeger
+    networks:
+      - wakanda-net
+    depends_on:
+      - service_registry
+
+# 4. Gestión Energía
+  gestion_energia:
+    build:
+      context: .
+      dockerfile: services/gestion_energia/Dockerfile
+    container_name: energy_service
+    environment:
+      - PORT=8002
+      - REGISTRY_URL=http://service_registry:8000/register
+      - JAEGER_HOST=jaeger
+    networks:
+      - wakanda-net
+    depends_on:
+      - service_registry
+
+  # 5. Gestión Agua
+  gestion_agua:
+    build:
+      context: .
+      dockerfile: services/gestion_agua/Dockerfile
+    container_name: water_service
+    environment:
+      - PORT=8003
+      - REGISTRY_URL=http://service_registry:8000/register
+      - JAEGER_HOST=jaeger
+    networks:
+      - wakanda-net
+    depends_on:
+      - service_registry
+
+  # 6. Gestión Residuos
+  gestion_residuos:
+    build:
+      context: .
+      dockerfile: services/gestion_residuos/Dockerfile
+    container_name: waste_service
+    environment:
+      - PORT=8004
+      - REGISTRY_URL=http://service_registry:8000/register
+      - JAEGER_HOST=jaeger
+    networks:
+      - wakanda-net
+    depends_on:
+      - service_registry
+
+  # 7. Seguridad
+  seguridad_vigilancia:
+    build:
+      context: .
+      dockerfile: services/seguridad_vigilancia/Dockerfile
+    container_name: security_service
+    environment:
+      - PORT=8005
+      - REGISTRY_URL=http://service_registry:8000/register
+      - JAEGER_HOST=jaeger
+    networks:
+      - wakanda-net
+    depends_on:
+      - service_registry
+networks:
+  wakanda-net:
+    driver: bridge
+

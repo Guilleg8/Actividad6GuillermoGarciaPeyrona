@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['prometheus:9090']
+
+  - job_name: 'wakanda_services'
+    static_configs:
+      - targets:
+        - 'service_registry:8000'
+        - 'gestion_trafico:8001'
+        - 'energy_service:8002'
+        - 'water_service:8003'
+        - 'waste_service:8004'
+        - 'security_service:8005'
