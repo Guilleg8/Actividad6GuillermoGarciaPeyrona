@@ -15,3 +15,4 @@ scrape_configs:
         - 'water_service:8003'
         - 'waste_service:8004'
         - 'security_service:8005'
+        - 'gateway_api:8080'

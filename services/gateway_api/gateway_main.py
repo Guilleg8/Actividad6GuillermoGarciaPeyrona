@@ -18,13 +18,10 @@ REGISTRY_URL = os.getenv("REGISTRY_URL", "http://service_registry:8000")
 app = FastAPI(title="Wakanda Gateway")
 setup_telemetry(app, SERVICE_NAME)
 
-# --- Configuración Circuit Breaker ---
-# Si 3 peticiones fallan, abrir circuito por 30 segundos
 circuit_breaker = aiobreaker.CircuitBreaker(
     fail_max=3,
-    reset_timeout=timedelta(seconds=30)
+    timeout_duration=timedelta(seconds=30)
 )
-
 
 # --- Helpers ---
 

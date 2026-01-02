@@ -2,30 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="659cf7d8-8975-4974-b407-f15187388ad0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/services/gateway_api/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/gateway_api/gateway_main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/gestion_agua/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/gestion_agua/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/gestion_agua/water_main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/gestion_energia/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/gestion_energia/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/gestion_energia/energy_main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/gestion_residuos/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/gestion_residuos/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/gestion_residuos/waste_main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/gestion_trafico/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/gestion_trafico/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/gestion_trafico/traffic_main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/seguridad_vigilancia/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/seguridad_vigilancia/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/seguridad_vigilancia/security_main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/service_registry/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/service_registry/registry_main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wakanda_shared/telemetry.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/energy_service/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/traffic_service/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/prometheus.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prometheus.yml" beforeDir="false" afterPath="$PROJECT_DIR$/prometheus.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/gateway_api/gateway_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/gateway_api/gateway_main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

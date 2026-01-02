@@ -68,14 +68,14 @@ services:
     depends_on:
       - service_registry
 
-  # 3. API Gateway (La entrada única)
+# 6. API Gateway (Entrada Unificada)
   gateway_api:
     build:
       context: .
       dockerfile: services/gateway_api/Dockerfile
     container_name: gateway_api
     ports:
-      - "8080:8080" # Este es el único puerto que usará el cliente
+      - "8080:8080"  # Exponemos el Gateway al exterior en el puerto 8080
     environment:
       - PORT=8080
       - REGISTRY_URL=http://service_registry:8000
@@ -84,6 +84,8 @@ services:
       - wakanda-net
     depends_on:
       - service_registry
+      - gestion_trafico
+      - gestion_energia
 
 # 4. Gestión Energía
   gestion_energia:
