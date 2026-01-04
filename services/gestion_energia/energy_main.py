@@ -15,21 +15,18 @@ SERVICE_NAME = "gestion_energia"
 SERVICE_PORT = int(os.getenv("PORT", 8002))
 REGISTRY_URL = os.getenv("REGISTRY_URL", "http://service_registry:8000/register")
 
-# --- Modelos ---
 class EnergyReport(BaseModel):
     zone_id: str
     consumption_kwh: float
 
-# --- Estado ---
 grid_status = {
     "status": "STABLE",
     "total_load_mw": 450.5,
     "renewable_contribution_percent": 32.0
 }
 
-# --- Registro Automático ---
 async def register_service():
-    await asyncio.sleep(3) # Esperar un poco a que el registro arranque
+    await asyncio.sleep(3)
     async with httpx.AsyncClient() as client:
         try:
             my_url = f"http://{SERVICE_NAME}:{SERVICE_PORT}"
@@ -48,14 +45,12 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan, title="Wakanda Energy")
 setup_telemetry(app, SERVICE_NAME)
 
-# --- Endpoints ---
 @app.get("/energy/grid")
 async def get_grid_status():
     return grid_status
 
 @app.post("/energy/report")
 async def report_consumption(report: EnergyReport):
-    # Lógica simple: actualizar carga total simulada
     grid_status["total_load_mw"] += (report.consumption_kwh / 1000)
     return {"status": "received", "new_load": grid_status["total_load_mw"]}
 

@@ -1,44 +1,37 @@
 version: '3.8'
 
 services:
-  # ----------------------------------------------------------------
-  # SERVICIOS DE INFRAESTRUCTURA (Observabilidad)
-  # ----------------------------------------------------------------
 
-  # Jaeger: Para ver las trazas (quién llamó a quién y cuánto tardó)
+  # Jaeger
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
-      - "16686:16686" # UI Web de Jaeger
-      - "4317:4317"   # Puerto para recibir datos OTLP (gRPC)
+      - "16686:16686"
+      - "4317:4317"
     networks:
       - wakanda-net
 
-  # Prometheus: Para recolectar métricas numéricas
+  # Prometheus
   prometheus:
     image: prom/prometheus:latest
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "9090:9090" # UI Web de Prometheus
+      - "9090:9090"
     networks:
       - wakanda-net
 
-  # Grafana: Para visualizar los datos de Prometheus
+  # Grafana
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "3000:3000" # UI Web de Grafana
+      - "3000:3000"
     networks:
       - wakanda-net
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=wakanda # Contraseña para entrar
+      - GF_SECURITY_ADMIN_PASSWORD=wakanda
 
-  # ----------------------------------------------------------------
-  # SERVICIOS WAKANDA (Python)
-  # ----------------------------------------------------------------
-
-  # 1. Service Registry (El directorio telefónico)
+  # 1. Service Registry
   service_registry:
     build:
       context: .
@@ -51,14 +44,12 @@ services:
     networks:
       - wakanda-net
 
-  # 2. Gestión Tráfico (El servicio simulado)
+  # 2. Gestión Tráfico
   gestion_trafico:
     build:
       context: .
       dockerfile: services/gestion_trafico/Dockerfile
     container_name: gestion_trafico
-    # No exponemos puerto al host (localhost) para forzar el uso del Gateway,
-    # pero está abierto en la red interna (8001).
     environment:
       - PORT=8001
       - REGISTRY_URL=http://service_registry:8000/register
@@ -68,14 +59,14 @@ services:
     depends_on:
       - service_registry
 
-# 6. API Gateway (Entrada Unificada)
+# 6. API Gateway
   gateway_api:
     build:
       context: .
       dockerfile: services/gateway_api/Dockerfile
     container_name: gateway_api
     ports:
-      - "8080:8080"  # Exponemos el Gateway al exterior en el puerto 8080
+      - "8080:8080"
     environment:
       - PORT=8080
       - REGISTRY_URL=http://service_registry:8000

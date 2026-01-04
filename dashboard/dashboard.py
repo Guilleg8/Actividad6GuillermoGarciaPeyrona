@@ -2,19 +2,12 @@ import streamlit as st
 import requests
 import os
 
-# Configuración de la página
 st.set_page_config(page_title="Wakanda Control Center", layout="wide", page_icon="🏙️")
 
 st.title("🏙️ Wakanda Smart City - Panel de Control")
 st.markdown("**Conectado vía API Gateway (Entrada Unificada)**")
 
-# --- CONFIGURACIÓN CLAVE ---
-# En lugar de conectar a cada servicio por su puerto, conectamos TODO al Gateway (8080).
-# El Gateway se encarga de redirigir usando el nombre del servicio en la URL.
 GATEWAY_URL = os.getenv("GATEWAY_URL", "http://gateway_api:8080")
-
-# Definimos las rutas base pasando por el Gateway
-# Formato: http://gateway:8080/{nombre_servicio_en_registry}
 
 SERVICES = {
     "trafico":   f"{GATEWAY_URL}/gestion_trafico",
@@ -25,10 +18,8 @@ SERVICES = {
 }
 
 
-# Pestañas
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["🚦 Tráfico", "⚡ Energía", "💧 Agua", "♻️ Residuos", "🛡️ Seguridad"])
 
-# --- TAB 1: TRÁFICO ---
 with tab1:
     st.header("Gestión de Tráfico")
     col1, col2 = st.columns(2)
@@ -37,7 +28,6 @@ with tab1:
         st.subheader("Estado Intersecciones")
         if st.button("🔄 Consultar Estado (GET)"):
             try:
-                # Llamada: Gateway -> gestion_trafico -> /traffic/status
                 r = requests.get(f"{SERVICES['trafico']}/traffic/status")
                 if r.status_code == 200:
                     st.success("Conexión OK vía Gateway")
@@ -56,10 +46,10 @@ with tab1:
 
             if st.form_submit_button("Aplicar Cambios"):
                 payload = {
-                    "intersection_id": interseccion_id,  # Nombre técnico estándar
-                    "id": interseccion_id,  # Nombre corto
-                    "green_duration": tiempo_verde,  # Nombre largo
-                    "duration": tiempo_verde  # Nombre corto
+                    "intersection_id": interseccion_id,
+                    "id": interseccion_id,
+                    "green_duration": tiempo_verde,
+                    "duration": tiempo_verde
                 }
                 try:
                     r = requests.post(f"{SERVICES['trafico']}/traffic/adjust", json=payload)
@@ -68,7 +58,6 @@ with tab1:
                 except Exception as e:
                     st.error(f"Error: {e}")
 
-# --- TAB 2: ENERGÍA ---
 with tab2:
     st.header("Red Eléctrica (Smart Grid)")
 
@@ -93,7 +82,6 @@ with tab2:
             except Exception as e:
                 st.error(f"Error: {e}")
 
-# --- TAB 3: AGUA ---
 with tab3:
     st.header("Gestión Hídrica")
     st.info("Sistema de detección de fugas activo")
@@ -108,8 +96,7 @@ with tab3:
         except Exception as e:
             st.error(f"Error: {e}")
 
-# --- TAB 4: RESIDUOS ---
-# --- TAB 4: RESIDUOS (Código corregido para leer listas) ---
+
 with tab4:
     st.header("Recogida de Residuos")
     if st.button("🗑️ Estado Contenedores (GET)"):
@@ -117,20 +104,17 @@ with tab4:
             r = requests.get(f"{SERVICES['residuos']}/waste/containers")
             data = r.json()
 
-            # Diagnóstico visual: Mostramos qué ha llegado
             st.write("📦 Datos recibidos del camión:")
 
             if isinstance(data, list):
-                # Si llega una lista (ej: [{"id": 1, "level": 80}, ...])
                 st.success(f"Se han detectado {len(data)} contenedores.")
-                st.table(data)  # Los mostramos en una tabla bonita
+                st.table(data)
             else:
-                # Si llega un diccionario (el formato antiguo)
                 st.json(data)
 
         except Exception as e:
             st.error(f"Error procesando datos: {e}")
-# --- TAB 5: SEGURIDAD ---
+
 with tab5:
     st.header("Vigilancia y Seguridad")
     col1, col2 = st.columns(2)
