@@ -35,6 +35,9 @@ class TrafficStatus(BaseModel):
     signal_phase: str
     recommended_adjustment: TrafficAdjustment
 
+class TrafficUpdate(BaseModel):
+    intersection_id: str   # <--- ¡ESTE ES EL NOMBRE QUE BUSCAMOS!
+    duration: int          # <--- ¡Y ESTE!
 
 # --- Estado Global (Simulado) ---
 # Variable compartida que el "sensor" actualiza y la API lee
@@ -46,76 +49,134 @@ current_status = TrafficStatus(
     signal_phase="RED",
     recommended_adjustment=TrafficAdjustment(new_green_seconds=30)
 )
+# ... (Tu código anterior iría aquí arriba) ...
+
+# --- Configuración de Logging ---
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(SERVICE_NAME)
+
+# --- Variables Globales de Control ---
+SIMULATION_RUNNING = False
+CURRENT_GREEN_DURATION = 30  # Duración por defecto
 
 
-# --- Tareas en Segundo Plano (Concurrencia) ---
-async def simulate_sensors():
-    """Simula datos de sensores llegando cada 5 segundos."""
-    phases = ["NS_GREEN", "EW_GREEN", "ALL_RED"]
-    while True:
-        # Actualizamos el estado global
-        current_status.timestamp = datetime.utcnow().isoformat()
-        current_status.vehicle_count = random.randint(50, 500)
-        current_status.average_speed_kmh = round(random.uniform(10.0, 60.0), 2)
-        current_status.signal_phase = random.choice(phases)
+# --- Lógica de Negocio: Simulación de Tráfico ---
+async def simulate_traffic_cycle():
+    """
+    Simula cambios en el tráfico y el estado del semáforo en segundo plano.
+    Actualiza la variable global `current_status`.
+    """
+    global current_status
+    phases = ["RED", "GREEN", "YELLOW"]
 
-        logging.info(f"🔄 Sensor actualizado: {current_status.vehicle_count} vehículos.")
+    while SIMULATION_RUNNING:
+        # Simular datos aleatorios
+        vehicle_count = random.randint(0, 50)
 
-        # Dormimos 5 segundos sin bloquear el servidor (non-blocking sleep)
-        await asyncio.sleep(5)
+        # A más coches, menor velocidad promedio (lógica simple)
+        speed = max(5.0, 60.0 - vehicle_count * 0.8) if vehicle_count > 0 else 0.0
+
+        # Cambiar fase del semáforo aleatoriamente para la demo
+        current_phase = random.choice(phases)
+
+        # Actualizar el estado global
+        current_status = TrafficStatus(
+            intersection_id="I-12",
+            timestamp=datetime.utcnow().isoformat(),
+            vehicle_count=vehicle_count,
+            average_speed_kmh=round(speed, 2),
+            signal_phase=current_phase,
+            recommended_adjustment=TrafficAdjustment(new_green_seconds=CURRENT_GREEN_DURATION)
+        )
+
+        logger.debug(f"Simulación actualizada: {vehicle_count} vehículos, Fase {current_phase}")
+        await asyncio.sleep(3)  # Actualiza cada 3 segundos
 
 
+# --- Lógica de Infraestructura: Registro de Servicio ---
 async def register_service():
-    """Se registra en el Service Registry al iniciar."""
-    # Esperamos un poco para asegurar que el Registry esté levantado
-    await asyncio.sleep(2)
+    """Intenta registrar este servicio en el Service Registry."""
     async with httpx.AsyncClient() as client:
         try:
-            # Mi propia dirección dentro de la red Docker
-            my_url = f"http://{SERVICE_NAME}:{SERVICE_PORT}"
-            response = await client.post(REGISTRY_URL, json={
-                "service_name": SERVICE_NAME,
-                "url": my_url,
-                "health_url": f"{my_url}/health"
-            })
-            if response.status_code == 200:
-                logging.info(f"✅ Registrado exitosamente en {REGISTRY_URL}")
+            payload = {
+                "name": SERVICE_NAME,
+                "url": f"http://gestion_trafico:{SERVICE_PORT}",  # Hostname de Docker
+                "health_endpoint": f"http://gestion_trafico:{SERVICE_PORT}/health"
+            }
+            response = await client.post(REGISTRY_URL, json=payload, timeout=5.0)
+            if response.status_code in [200, 201]:
+                logger.info(f"✅ Servicio registrado exitosamente en {REGISTRY_URL}")
             else:
-                logging.error(f"❌ Fallo al registrar: {response.text}")
+                logger.warning(f"⚠️ Fallo al registrar servicio: {response.status_code}")
         except Exception as e:
-            logging.error(f"⚠️ No se pudo conectar al Registry ({e}). ¿Está corriendo?")
+            logger.error(f"❌ No se pudo contactar con el registry: {e}")
 
 
-# --- Ciclo de Vida de la App ---
+# --- Lifespan (Ciclo de Vida) ---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # INICIO: Arrancar tareas
-    sensor_task = asyncio.create_task(simulate_sensors())
-    registration_task = asyncio.create_task(register_service())
-    yield
-    # FIN: (Opcional) Cancelar tareas si fuera necesario
-    sensor_task.cancel()
+    # 1. Inicio: Configurar telemetría y simulación
+    setup_telemetry(app, SERVICE_NAME)
+
+    global SIMULATION_RUNNING
+    SIMULATION_RUNNING = True
+    simulation_task = asyncio.create_task(simulate_traffic_cycle())
+
+    # 2. Inicio: Intentar registrar el servicio
+    # Usamos create_task para no bloquear el arranque si el registry está lento
+    asyncio.create_task(register_service())
+
+    yield  # El servicio corre aquí
+
+    # 3. Apagado: Limpieza
+    SIMULATION_RUNNING = False
+    simulation_task.cancel()
+    logger.info("🛑 Servicio detenido")
 
 
-app = FastAPI(lifespan=lifespan, title="Wakanda Traffic Service")
-setup_telemetry(app, SERVICE_NAME)
+# --- Instancia de FastAPI ---
+app = FastAPI(
+    title="Servicio de Gestión de Tráfico",
+    lifespan=lifespan
+)
 
 
 # --- Endpoints ---
 
-@app.get("/traffic/status", response_model=TrafficStatus)
+@app.get("/health")
+async def health_check():
+    """Endpoint estándar de salud para Docker/K8s."""
+    return {"status": "ok", "service": SERVICE_NAME}
+
+
+@app.get("/status", response_model=TrafficStatus)
 async def get_traffic_status():
+    """Devuelve el estado actual (simulado) de la intersección."""
     return current_status
 
 
-@app.post("/traffic/adjust")
-async def adjust_traffic(adjustment: TrafficAdjustment):
-    logging.info(f"🔧 Ajustando semáforos a {adjustment.new_green_seconds}s")
-    # Aquí iría la lógica real de hardware
-    current_status.recommended_adjustment = adjustment
-    return {"status": "adjusted", "details": adjustment}
+@app.post("/adjust_signal")
+async def adjust_traffic_signal(update: TrafficUpdate):
+    """
+    Recibe actualizaciones externas para modificar el semáforo.
+    Aquí usamos el modelo TrafficUpdate que definiste.
+    """
+    global CURRENT_GREEN_DURATION
+
+    logger.info(f"📡 Recibida solicitud de ajuste para intersección {update.intersection_id}")
+    logger.info(f"⏱️ Ajustando duración de luz verde a {update.duration} segundos")
+
+    # Actualizamos la variable que usa la simulación
+    CURRENT_GREEN_DURATION = update.duration
+
+    return {
+        "status": "success",
+        "message": f"Duración actualizada a {update.duration}s para intersección {update.intersection_id}"
+    }
 
 
-@app.get("/health")
-async def health_check():
-    return {"status": "ok"}
+# --- Entrypoint para ejecución local ---
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=SERVICE_PORT)

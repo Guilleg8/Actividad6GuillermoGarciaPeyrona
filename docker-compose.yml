@@ -92,7 +92,7 @@ services:
     build:
       context: .
       dockerfile: services/gestion_energia/Dockerfile
-    container_name: energy_service
+    container_name: gestion_energia
     environment:
       - PORT=8002
       - REGISTRY_URL=http://service_registry:8000/register
@@ -107,7 +107,7 @@ services:
     build:
       context: .
       dockerfile: services/gestion_agua/Dockerfile
-    container_name: water_service
+    container_name: gestion_agua
     environment:
       - PORT=8003
       - REGISTRY_URL=http://service_registry:8000/register
@@ -122,7 +122,7 @@ services:
     build:
       context: .
       dockerfile: services/gestion_residuos/Dockerfile
-    container_name: waste_service
+    container_name: gestion_residuos
     environment:
       - PORT=8004
       - REGISTRY_URL=http://service_registry:8000/register
@@ -137,7 +137,7 @@ services:
     build:
       context: .
       dockerfile: services/seguridad_vigilancia/Dockerfile
-    container_name: security_service
+    container_name: seguridad_vigilancia
     environment:
       - PORT=8005
       - REGISTRY_URL=http://service_registry:8000/register
@@ -146,7 +146,24 @@ services:
       - wakanda-net
     depends_on:
       - service_registry
+
+  dashboard:
+      image: python:3.9-slim
+      container_name: wakanda_dashboard
+      working_dir: /app
+      volumes:
+        - ./dashboard:/app
+      environment:
+        - GATEWAY_URL=http://gateway_api:8080
+      command: >
+        sh -c "pip install streamlit requests && streamlit run dashboard.py --server.port=8501 --server.address=0.0.0.0"
+      ports:
+        - "8501:8501"
+      networks:
+        - wakanda-net
+      depends_on:
+        - gateway_api
+
 networks:
   wakanda-net:
     driver: bridge
-
